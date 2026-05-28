@@ -1,109 +1,107 @@
-# Remote Possibility — Cardputer + CyberThreatGotchi
-
-**Hacker Planet LLC** · Authorized lab use only — networks and systems you own or have written permission to test.
-
-Show **Cipherhorn mood** and the latest threat on your M5Stack Cardputer by polling the CTG web API over Wi-Fi.
-
-## Architecture
-
-```
-  BPI-R3 Mini (CTG)                    M5Stack Cardputer
-  ┌─────────────────┐                  ┌──────────────────────┐
-  │ main.py --web   │  Wi-Fi LAN       │ Remote Possibility   │
-  │ :8765 /api/status ────────────────►│ GET every 4s (cfg)   │
-  └─────────────────┘                  └──────────────────────┘
-```
-
-Read-only client — no CTG firmware changes required.
-
-## Desktop test (before flashing)
-
-Terminal A — start CTG:
-
-```powershell
-cd C:\Users\Owner\Projects\cyberThreatGotchi
-python main.py --simulation --web
-```
-
-Terminal B — MicroPython helpers / pytest:
-
-```powershell
-cd C:\Users\Owner\Projects\Remote-Possibility
-python -m pytest tests/ -q
-python ctg_status.py
-```
-
-Or from the main CTG repo: `python scripts/cardputer_status.py --host 127.0.0.1 --watch`
-
-## PlatformIO firmware (recommended)
-
-```powershell
-cd C:\Users\Owner\Projects\Remote-Possibility\platformio
-pio run -e m5stack-cardputer
-pio run -e m5stack-cardputer -t upload
-```
-
-Copy `platformio/.pio/build/m5stack-cardputer/firmware.bin` to M5 OS package name `remote_possibility.bin` (SD `/firmware/` or `/apps/remote_possibility/` per [M5_OS-Cardputer](https://github.com/salvador-Data/M5_OS-Cardputer)).
-
-### First-time Wi-Fi + CTG URL
-
-1. Flash firmware; open USB serial at **115200**.
-2. Type `HELP` for commands, e.g. `SET SSID MyLab`, `SET PASS secret`, `SET HOST 192.168.1.50`, `SET PORT 8765`, `WIFI`.
-3. On device: **e** = settings menu, edit host/port/Wi-Fi, **Enter** to save (stored in NVS).
-
-### Keyboard map (status view)
-
-| Key | Action |
-|-----|--------|
-| `r` | Poll `/api/status` now |
-| `e` | Open settings (host, port, Wi-Fi, poll interval) |
-| `;` / `w` | Move up (settings menu) |
-| `.` / `s` | Move down (settings menu) |
-| Enter | Edit selected setting |
-| `` ` `` | Back from settings / cancel edit |
-
-### Optional SD config (M5 OS layout)
-
-If microSD is mounted, load ` /config/remote_possibility.cfg` (key=value):
-
-```ini
-host=192.168.1.50
-port=8765
-ssid=YourLabSSID
-pass=YourLabPassword
-poll_ms=4000
-```
-
-NVS values from the keyboard UI override after save; SD file applies on boot before NVS merge.
-
-## MicroPython
-
-Copy `ctg_status.py` to the Cardputer SD payload or run from M5 OS. Edit `CTG_HOST` / `CTG_PORT` at top of file, or use desktop `fetch_status(host, port)`.
-
-## JSON fields used
-
-| Path | Display |
-|------|---------|
-| `gotchi.mood` | IDLE, ALERT, BLOCK, … |
-| `gotchi.name` | Title |
-| `gotchi.level` | Level |
-| `gotchi.threats_blocked` / `threats_seen` | Counters |
-| `gotchi.status_line` | Caption |
-| `threats[0].source_ip` | Last attacker |
-| `threats[0].severity` | Severity |
-| `threats[0].action_taken` | IPS action |
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---------|-----|
-| `CTG unreachable` | Ping CTG IP; confirm `python main.py --web`; firewall allows **8765** |
-| `no WiFi` | Set SSID/pass in settings or serial `SET SSID` / `SET PASS` then `WIFI` |
-| Empty threats | Normal until simulation/live traffic |
-| Wrong mood | Compare browser `http://<ctg-ip>:8765/api/status` |
-
-## Ecosystem
-
-- [cyberThreatGotchi](https://github.com/salvador-Data/cyberThreatGotchi) — edge IPS + `/api/status`
-- [M5_OS-Cardputer](https://github.com/salvador-Data/M5_OS-Cardputer) — launcher + `remote_possibility.bin`
-- [BLE-Bot-Cardputer](https://github.com/salvador-Data/BLE-Bot-Cardputer) — separate BLE scout SKU (same hardware)
+# Remote Possibility — M5 Cardputer universal IR remote
+
+**Hacker Planet LLC** · Authorized lab use only — control devices you own or have written permission to operate.
+
+Keyboard-first **infrared remote** for TV, fan, AC, projector, and other IR-controlled gear. Learn OEM remotes, store JSON libraries on SD, and run guided scan mode for common NEC patterns.
+
+## Architecture
+
+```
+  OEM remote ──IR──► Grove RX (GPIO1)     M5 Cardputer
+                     Learn / decode  ◄──►  IR TX GPIO44 ──► TV / fan / AC
+                     JSON library on SD /home/default/remotes/
+```
+
+No Wi-Fi required for send/learn. Scan mode is an **authorized lab demo** — confirm each code with **y** before saving.
+
+## Desktop test (host helpers)
+
+```powershell
+cd C:\Users\Owner\Projects\Remote-Possibility
+python -m pytest tests/ -q
+python remote_codec.py
+```
+
+Validate JSON before copying to SD:
+
+```powershell
+python -c "from remote_codec import load_remote_file; print(load_remote_file('data/remotes/examples/samsung_tv_lab.json'))"
+```
+
+## PlatformIO firmware
+
+```powershell
+cd C:\Users\Owner\Projects\Remote-Possibility\platformio
+pio run -e m5stack-cardputer
+pio run -e m5stack-cardputer -t upload
+```
+
+Copy `platformio/.pio/build/m5stack-cardputer/firmware.bin` to M5 OS package name `remote_possibility.bin` (SD `/apps/remote_possibility/` per [M5_OS-Cardputer](https://github.com/salvador-Data/M5_OS-Cardputer)).
+
+### SD setup
+
+1. Format microSD; boot **M5 OS** once to create VFS folders.
+2. Copy `data/remotes/examples/*.json` → **`/home/default/remotes/`**
+3. Flash Remote Possibility or install via manifest.
+
+Hardware wiring: [HARDWARE.md](HARDWARE.md)
+
+### Keyboard map
+
+| Key | Action |
+|-----|--------|
+| `;` / `w` | Move up |
+| `.` / `s` | Move down |
+| Enter | Select / send / save |
+| `` ` `` | Back |
+| `l` | Learn mode (from home) |
+| `f` | Scan mode (from home) |
+| `x` | Send highlighted command |
+| `y` / `n` | Scan hit yes / try next |
+
+### Screens
+
+| Screen | Purpose |
+|--------|---------|
+| Home | Library, learn, scan, about |
+| Library | Category → remote list → command send |
+| Learn | Capture IR from OEM remote → save JSON |
+| Scan | Category → brand → try NEC candidates with confirm |
+
+## Remote JSON format
+
+```json
+{
+  "v": 1,
+  "name": "Living Room TV",
+  "category": "tv",
+  "brand": "Samsung",
+  "protocol": "NEC",
+  "address": 57568,
+  "commands": [
+    {"label": "power", "protocol": "NEC", "address": 57568, "command": 16575}
+  ]
+}
+```
+
+Optional `"raw": [9000, 4500, ...]` array per command for unknown protocols.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| No IR received in learn | Wire receiver to Grove **G1**; point OEM remote at module |
+| TV ignores sends | Aim Cardputer IR window; try scan mode or re-learn |
+| Empty library | Copy JSON to `/home/default/remotes/`; remount SD |
+| SD not mounted | Insert card before boot; check M5 OS file browser |
+
+## Legacy CTG client
+
+CyberThreatGotchi Wi-Fi status polling lived in v1.x firmware. It is archived under [`legacy/ctg_client/`](../legacy/ctg_client/). CTG field status remains on the main CTG web UI.
+
+## Ecosystem
+
+- [M5_OS-Cardputer](https://github.com/salvador-Data/M5_OS-Cardputer) — launcher + `remote_possibility.bin`
+- [BLE-Bot-Cardputer](https://github.com/salvador-Data/BLE-Bot-Cardputer) — separate BLE scout SKU (same hardware)
+- [cyberThreatGotchi](https://github.com/salvador-Data/cyberThreatGotchi) — edge IPS (not required for IR remote)
+

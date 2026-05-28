@@ -1,0 +1,14 @@
+{
+  "v": 1,
+  "name": "Samsung TV (lab)",
+  "category": "tv",
+  "brand": "Samsung",
+  "protocol": "NEC",
+  "address": 57568,
+  "commands": [
+    {"label": "power", "protocol": "NEC", "address": 57568, "command": 16575},
+    {"label": "vol_up", "protocol": "NEC", "address": 57568, "command": 57375},
+    {"label": "vol_dn", "protocol": "NEC", "address": 57568, "command": 53327},
+    {"label": "mute", "protocol": "NEC", "address": 57568, "command": 61455}
+  ]
+}

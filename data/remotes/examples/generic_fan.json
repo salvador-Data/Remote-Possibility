@@ -1,0 +1,12 @@
+{
+  "v": 1,
+  "name": "Generic fan NEC",
+  "category": "fan",
+  "brand": "Generic",
+  "protocol": "NEC",
+  "address": 255,
+  "commands": [
+    {"label": "power", "protocol": "NEC", "address": 255, "command": 17085},
+    {"label": "speed", "protocol": "NEC", "address": 255, "command": 765}
+  ]
+}

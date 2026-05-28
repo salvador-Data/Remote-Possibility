@@ -1,49 +1,52 @@
-﻿# Remote Possibility — M5 Cardputer CTG client
+﻿# Remote Possibility — M5 Cardputer universal remote
 
-**Hacker Planet LLC** · Philadelphia, PA · [cardputer.html](https://hackerplanet.dev/cardputer.html#remote-possibility)
+**Hacker Planet LLC** · Philadelphia, PA · Founder **Salvador Data** ([salvadorData@proton.me](mailto:salvadorData@proton.me))
 
-Authorized-lab **CyberThreatGotchi remote status client** for the M5Stack Cardputer. Polls your CTG instance `GET /api/status` over Wi‑Fi and shows mood, level, and recent threats on the ST7789 240×135 display with full QWERTY configuration.
+| | |
+|---|---|
+| GitHub | [salvador-Data/Remote-Possibility](https://github.com/salvador-Data/Remote-Possibility) |
+| Reddit | [u/SalvadorData](https://www.reddit.com/user/SalvadorData) |
+| Product | [hackerplanet.dev/cardputer.html#remote-possibility](https://hackerplanet.dev/cardputer.html#remote-possibility) |
+
+Pocket **universal remote** for the M5Stack Cardputer: **infrared**, **433/315 MHz RF OOK**, and **CC1101 sub-GHz** (extensible SD profile format for any supported protocol). Learn OEM remotes, scan TV/fan/AC NEC libraries, save to microSD.
 
 | SKU | Stripe key | Retail |
 |-----|------------|--------|
-| Remote Possibility | `remotePossibility` | **$89.99** (+ tax/shipping) |
-
-Philadelphia-assembled units ship pre-flashed. DIY builders build from this repo.
+| Remote Possibility | `remotePossibility` | **$99.99** (+ tax/shipping) |
 
 ## Features
 
-- Wi-Fi via **NVS** saved credentials, **serial `SET`**, or optional SD `/config/remote_possibility.cfg` (M5 OS paths)
-- HTTP poll with **timeout**, **reconnect**, and manual **`r`** refresh
-- **Settings UI** on keyboard: CTG host, port, SSID, password, poll interval
-- PlatformIO env **`m5stack-cardputer`** (`M5Cardputer` + `ArduinoJson`)
-- MicroPython **`ctg_status.py`** with desktop-testable parsers
+- **IR** — NEC + raw via 38 kHz module (GPIO 44 TX / 1 RX)
+- **RF** — 433 MHz OOK learn/send (RCSwitch); 315 MHz = swap module, same pins
+- **Sub-GHz** — CC1101 SPI wiring documented; enable `RP_ENABLE_CC1101=1` for full driver
+- **SD library** — `*.remote` / JSON under `/home/default/remotes`
+- **Scan** — IR NEC candidates for TV, fan, AC, projector
+- **Legacy** — CyberThreatGotchi HTTP client archived in `legacy/ctg_client/`
+
+## Hardware
+
+Full BOM and GPIO tables: [docs/HARDWARE.md](docs/HARDWARE.md)
 
 ## Contents
 
 | Path | Role |
 |------|------|
-| `platformio/` | Arduino firmware — `pio run -e m5stack-cardputer` |
-| `ctg_status.py` | MicroPython client |
-| `docs/CARDPUTER.md` | Flash, keyboard map, troubleshooting |
-| `tests/test_ctg_status.py` | Parser unit tests |
+| `platformio/` | Multi-transport firmware |
+| `remote_codec.py` | Host-side JSON profile validation |
+| `docs/CARDPUTER.md` | Flash & keyboard map |
+| `legacy/ctg_client/` | Archived CTG status client (v1.x) |
 
 ## Quick start
 
 ```powershell
 cd C:\Users\Owner\Projects\Remote-Possibility\platformio
-pio run -e m5stack-cardputer
+py -m platformio run -e m5stack-cardputer
 ```
 
-USB serial **115200**: `HELP`, `SET HOST 192.168.1.50`, `SET SSID MyLab`, `SET PASS secret`, `WIFI`.
+Package `firmware.bin` → `remote_possibility.bin` for [M5_OS-Cardputer](https://github.com/salvador-Data/M5_OS-Cardputer).
 
-## M5 OS launcher
+## Authorized use
 
-Install **M5 OS** first: [M5_OS-Cardputer](https://github.com/salvador-Data/M5_OS-Cardputer). Package firmware as `remote_possibility.bin`.
+Only on **devices and spaces you own** or where you have **written permission**. IR/RF/sub-GHz replay can control third-party equipment — obtain consent in shared buildings.
 
-## Shop & docs
-
-- Product: https://hackerplanet.dev/cardputer.html#remote-possibility
-- CTG API: [cyberThreatGotchi docs/WEB.md](https://github.com/salvador-Data/cyberThreatGotchi/blob/main/docs/WEB.md)
-- Pricing: [PRODUCT_PRICING.md](https://github.com/salvador-Data/cyberThreatGotchi/blob/main/docs/PRODUCT_PRICING.md)
-
-*Authorized networks and systems you own or have written permission to test only.*
+*Partner fulfillment for module kits; Philadelphia direct ship for assembled Cardputer SKUs.*
