@@ -30,6 +30,17 @@ def test_parse_command_minimal():
     assert row["raw"] == []
 
 
+def test_parse_remote_profile_transport():
+    payload = {
+        "name": "Gate",
+        "category": "other",
+        "transport": "rf433",
+        "commands": [{"label": "open", "address": 1, "command": 2}],
+    }
+    row = parse_remote_profile(payload)
+    assert row["transport"] == "rf433"
+
+
 def test_parse_remote_profile():
     payload = {
         "name": "Living Room TV",
