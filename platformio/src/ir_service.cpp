@@ -8,8 +8,7 @@
 static bool gIrReady = false;
 
 void irInit() {
-    IrSender.begin(DISABLE_LED_FEEDBACK);
-    IrSender.setSendPin(IR_TX_PIN);
+    IrSender.begin(IR_TX_PIN);
     IrReceiver.begin(IR_RX_PIN, ENABLE_LED_FEEDBACK);
     gIrReady = true;
 }
