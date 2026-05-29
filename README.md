@@ -45,6 +45,18 @@ py -m platformio run -e m5stack-cardputer
 
 Package `firmware.bin` → `remote_possibility.bin` for [M5_OS-Cardputer](https://github.com/salvador-Data/M5_OS-Cardputer).
 
+## Firmware download
+
+Prebuilt Cardputer binary (PlatformIO env `m5stack-cardputer`):
+
+| Asset | URL |
+|-------|-----|
+| `firmware.bin` | [Latest GitHub release](https://github.com/salvador-Data/Remote-Possibility/releases/latest/download/firmware.bin) |
+
+Install via **M5 OS** manifest OTA or copy to SD as `remote_possibility.bin` under `/apps/remote_possibility/` (see [docs/CARDPUTER.md](docs/CARDPUTER.md)). Verify **SHA-256** in [M5_OS manifest.example.json](https://github.com/salvador-Data/M5_OS-Cardputer/blob/main/data/manifest.example.json) before flash.
+
+Tagged releases are built by [`.github/workflows/release.yml`](.github/workflows/release.yml) on `v*` tags.
+
 ## Authorized use
 
 Only on **devices and spaces you own** or where you have **written permission**. IR/RF/sub-GHz replay can control third-party equipment — obtain consent in shared buildings.
